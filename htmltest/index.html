@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FastAPI Simple API Tester</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 700px; margin: 20px auto; }
+    input, button, textarea { font-size: 1em; padding: 5px; margin: 5px 0; width: 100%; box-sizing: border-box; }
+    button { width: auto; }
+    section { margin-bottom: 30px; border-bottom: 1px solid #c16262; padding-bottom: 20px; }
+    pre { background: #eee; padding: 10px; max-height: 200px; overflow-y: auto; }
+    label { font-weight: bold; display: block; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+  <h1>FastAPI Simple API Tester</h1>
+
+  <section id="register-section">
+    <h2>Register</h2>
+    <input type="text" id="reg-username" placeholder="Username" />
+    <input type="password" id="reg-password" placeholder="Password" />
+    <button onclick="register()">Register</button>
+    <pre id="reg-result"></pre>
+  </section>
+
+  <section id="login-section">
+    <h2>Login</h2>
+    <input type="text" id="login-username" placeholder="Username" />
+    <input type="password" id="login-password" placeholder="Password" />
+    <button onclick="login()">Login</button>
+    <pre id="login-result"></pre>
+  </section>
+
+  <section id="me-section">
+    <h2>Get me and courses count</h2>
+    <button onclick="get_me()">Get</button>
+    <pre id="me-result"></pre>
+  </section>
+
+  <section id="courses-section">
+    <h2>Courses</h2>
+    <input type="text" id="course-title" placeholder="Course Title" />
+    <textarea id="course-desc" placeholder="Course Description"></textarea>
+    <button onclick="createCourse()">Create Course</button>
+    <button onclick="listCourses()">List My Courses</button>
+    <pre id="courses-result"></pre>
+  </section>
+
+  <section id="delete-course">
+    <h2>Delete Course</h2>
+    <input type="text" id="course-id" placeholder="Course id" />
+    <pre id="delete-course-result"></pre>
+    <button onclick="deleteCourse()">Delete course</button>
+  </section>
+
+<script>
+  const BASE_URL = 'http://127.0.0.1:8000'
+  let token = '';
+  async function register() {
+    const username = document.getElementById('reg-username').value;
+    const password = document.getElementById('reg-password').value;
+    const resEl = document.getElementById('reg-result');
+
+    if (!username || !password) {
+      resEl.textContent = 'Please enter username and password';
+      return;
+    }
+
+    try {
+      const res = await fetch(BASE_URL+'/register', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({username, password})
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
+      resEl.textContent = JSON.stringify(data, null, 2);
+    } catch (e) {
+      resEl.textContent = 'Error: ' + e.message;
+    }
+  }
+
+  async function login() {
+    const username = document.getElementById('login-username').value;
+    const password = document.getElementById('login-password').value;
+    const resEl = document.getElementById('login-result');
+
+    if (!username || !password) {
+      resEl.textContent = 'Please enter username and password';
+      return;
+    }
+
+    const params = new URLSearchParams();
+    params.append('username', username);
+    params.append('password', password);
+
+    try {
+      const res = await fetch(BASE_URL+'/login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({username, password})
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
+      token = data.access_token;
+      resEl.textContent = 'Logged in successfully. Token saved.';
+    } catch (e) {
+      resEl.textContent = 'Error: ' + e.message;
+    }
+  }
+
+  async function createCourse() {
+    const title = document.getElementById('course-title').value;
+    const description = document.getElementById('course-desc').value;
+    const resEl = document.getElementById('courses-result');
+    if (!token) {
+      resEl.textContent = 'You must login first';
+      return;
+    }
+    if (!title) {
+      resEl.textContent = 'Course title required';
+      return;
+    }
+    try {
+      const res = await fetch(BASE_URL+'/courses/', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({title, description})
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
+      resEl.textContent = 'Course created:\n' + JSON.stringify(data, null, 2);
+    } catch (e) {
+      resEl.textContent = 'Error: ' + e.message;
+    }
+  }
+
+  async function listCourses() {
+    const resEl = document.getElementById('courses-result');
+    if (!token) {
+      resEl.textContent = 'You must login first';
+      return;
+    }
+    try {
+      const res = await fetch(BASE_URL+'/courses/', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
+      resEl.textContent = JSON.stringify(data, null, 2);
+    } catch (e) {
+      resEl.textContent = 'Error: ' + e.message;
+    }
+  }
+
+  async function get_me() {
+    const resEl = document.getElementById('me-result');
+    if (!token) {
+      resEl.textContent = 'You must login first';
+      return;
+    }
+    try {
+      const res = await fetch(BASE_URL+'/me', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
+      resEl.textContent = JSON.stringify(data, null, 2);
+    } catch (e) {
+      resEl.textContent = 'Error: ' + e.message;
+    }
+  }
+
+
+  async function deleteCourse(courseId) {
+    const resEl = Number(document.getElementById('course-id').value);
+    const textRes = document.getElementById('delete-course-result')
+    if (!resEl) {
+      alert("Enter valid id!")
+      return
+    }
+    if (confirm("Delete selected course?")) {
+        await fetch(BASE_URL+`/courses/${resEl}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        })
+        .then(async response => {
+          const resp = await response.json()
+            if (response.ok) {
+                textRes.innerHTML = "Course deleted!"
+            } else {
+                textRes.innerHTML = `${resp.detail}`;
+            }
+        });
+    }
+}
+</script>
+
+</body>
+</html>
