@@ -1,0 +1,11 @@
+TV 500
+Laptop 1200
+Phone 900
+Headphones 400
+Tablet 750
+Camera 600
+Speaker 300
+Smartwatch 950
+Monitor 800
+Printer 450
+Router 350
