@@ -1,0 +1,22 @@
+names = [
+    "Ardyn Vale",
+    "Lyra Moonshadow",
+    "Kael Thornfire",
+    "Seraphine Duskbane",
+    "Tharion Emberfell",
+    "Elowen Starwhisper",
+    "Draven Blackthorn",
+    "Isolde Frostwind",
+    "Corwin Nightshade",
+    "Sylvara Dawnblade",
+    "Fenric Stormrider",
+    "Mariselle Sunveil",
+    "Kaelen Darkwater",
+    "Thalia Silverleaf",
+    "Varion Ashwalker",
+    "Elysia Windraven",
+    "Dorian Shadowcrest",
+    "Lyssandra Fireveil",
+    "Roderic Ironhart",
+    "Selene Mistbourne"
+]
