@@ -1,0 +1,7 @@
+python-dotenv~=1.2.1
+g4f~=6.6.7
+fastapi~=0.121.0
+pydantic~=2.12.4
+discord.py~=2.6.4
+uvicorn~=0.38.0
+requests~=2.32.5

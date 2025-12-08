@@ -1,0 +1,17 @@
+version: '3.9'
+
+services:
+  ai_service:
+    build: ./services/ai
+    container_name: ai_service
+    ports:
+      - "8001:8001"
+
+  main:
+    build: .
+    container_name: main_script
+    depends_on:
+      - ai_service
+    env_file:
+      - .env
+    command: ["python", "main.py"]
