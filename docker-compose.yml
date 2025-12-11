@@ -6,12 +6,18 @@ services:
     container_name: ai_service
     ports:
       - "8001:8001"
+  econ:
+    build: services/econ
+    container_name: econ_service
+    ports:
+      - "8002:8002"
 
   main:
     build: .
     container_name: main_script
     depends_on:
       - ai_service
+      - econ
     env_file:
       - .env
     command: ["python", "main.py"]
